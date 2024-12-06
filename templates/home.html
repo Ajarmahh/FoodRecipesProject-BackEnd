@@ -3,12 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to MovieWeb App</title>
+    <title>life changer</title>
     <link rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1>Your first step towards a healthy lifestyle.</h1>
+      <h1>Recipes</h1>
+        {% for recipe in recipes %}
+            <img src="{{ recipe.image }}" alt="Recipe Image" width="200px" height="200px"/>
+            <h2>{{ recipe.name }}</h2>
+            <p><strong>Description </strong>: {{recipe.description}}</p>
+            <p><strong>Ingredients </strong>: {{recipe.ingredients}}</p>
+            <p><strong>How to make {{recipe.name}} </strong>: {{recipe.how_to_prepare}}</p>
+        {% endfor %}
     </div>
 </body>
 </html>

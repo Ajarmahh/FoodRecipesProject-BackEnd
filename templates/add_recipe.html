@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Movie</title>
+    <link rel="stylesheet">
+</head>
+<body>
+    <h1>Add your recipe</h1>
+    <form action="/add_recipe" method="POST">
+        <label for="name">Recipe's Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="description">Add description:</label>
+        <input type="text" id="description" name="description" required  title="description">
+
+        <label for="ingredients">Add the ingredients:</label>
+        <input type="text" id="ingredients" name="ingredients" required>
+
+        <label for="how_to_prepare">Directions on how to prepare the recipe:</label>
+        <input type="text" id="how_to_prepare" name="how_to_prepare" required>
+
+        <label for="image">Or provide an image URL:</label>
+        <input type="url" id="image" name="image" placeholder="https://example.com/image.jpg">
+
+
+        <button type="submit">Add Recipe</button>
+    </form>
+</body>
+</html>

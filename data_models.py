@@ -11,7 +11,7 @@ class Recipes(Base):
     """
     __tablename__ = 'recipes'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    dish_name = Column(String, nullable=False)
+    name = Column(String, nullable=False)
     description = Column(String, nullable=False)
     ingredients = Column(String, nullable=False)
     how_to_prepare = Column(String, nullable=False)
