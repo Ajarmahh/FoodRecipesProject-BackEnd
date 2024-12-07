@@ -16,8 +16,8 @@ class DataManager:
         Base.metadata.create_all(self.engine)
 
     def get_data(self):
-        return self.session.query(Recipes.name, Recipes.description, Recipes.ingredients, Recipes.image,
-                                  Recipes.how_to_prepare).all()
+        recipes = self.session.query(Recipes).all()
+        return recipes
 
     def add_recipe(self, name, description, ingredients, image, how_to_prepare):
         new_recipe = Recipes(name=name, description=description, ingredients=ingredients, image=image,

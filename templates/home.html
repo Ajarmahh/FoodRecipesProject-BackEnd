@@ -15,7 +15,15 @@
             <p><strong>Description </strong>: {{recipe.description}}</p>
             <p><strong>Ingredients </strong>: {{recipe.ingredients}}</p>
             <p><strong>How to make {{recipe.name}} </strong>: {{recipe.how_to_prepare}}</p>
+
+            <button class="delete-recipe-button">
+                <a href="{{ url_for('delete_recipe', recipe_id=recipe.id) }}">Delete Recipe</a>
+            </button> <br><br>
+
         {% endfor %}
+        <button class="add-recipe-button">
+            <a href="{{ url_for('add_recipe')}}">Add Recipe</a>
+        </button>
     </div>
 </body>
 </html>
