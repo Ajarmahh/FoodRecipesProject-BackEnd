@@ -24,3 +24,9 @@ class DataManager:
                              how_to_prepare=how_to_prepare)
         self.session.add(new_recipe)
         self.session.commit()
+
+    def delete_recipe(self, recipe_id):
+        recipe = self.session.query(Recipes).get(recipe_id)
+        if recipe:
+            self.session.delete(recipe)
+            self.session.commit()

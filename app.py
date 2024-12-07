@@ -36,5 +36,15 @@ def add_recipe():
     return render_template('add_recipe.html')
 
 
+@app.route('/delete_recipe/<int:recipe_id>')
+def delete_recipe(recipe_id):
+    try:
+        data.delete_recipe(recipe_id)
+        return redirect(url_for('get_recipes'))
+    except Exception as e:
+        data.session.rollback()
+        print(f'Error deleting recipe: {e}')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
