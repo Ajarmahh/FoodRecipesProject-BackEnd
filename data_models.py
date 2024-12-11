@@ -16,3 +16,16 @@ class Recipes(Base):
     ingredients = Column(String, nullable=False)
     how_to_prepare = Column(String, nullable=False)
     image = Column(String, nullable=False)
+
+    def to_dict(self):
+        """
+        Converts the Recipes object into a dictionary
+        """
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "ingredients": self.ingredients,
+            "how_to_prepare": self.how_to_prepare,
+            "image": self.image,
+        }
