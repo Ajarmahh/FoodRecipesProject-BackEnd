@@ -1,12 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, request, jsonify
 from data_manager import DataManager
 from flask_cors import CORS
 
 app = Flask(__name__)
 # Enable Cross-Origin Resource Sharing, allowing external clients to access the API.
 CORS(app)
-# Configure CORS to allow requests only from the specified origin, running on localhost: 3000
-CORS(app, resources={r"/*": {"origins": "<http://localhost:3000>"}})
 
 data = DataManager("data/recipes.db")
 
@@ -58,4 +56,4 @@ def delete_recipe(recipe_id):
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=4000 ,debug=True)
+    app.run(host="0.0.0.0", port=4000, debug=True)
