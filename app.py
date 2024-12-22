@@ -6,6 +6,9 @@ app = Flask(__name__)
 # Enable Cross-Origin Resource Sharing, allowing external clients to access the API.
 CORS(app)
 
+# Enable CORS to allow requests from http://localhost:5173
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+
 data = DataManager("data/recipes.db")
 
 
