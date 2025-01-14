@@ -19,9 +19,9 @@ class DataManager:
         recipes = self.session.query(Recipes).all()
         return [recipe.to_dict() for recipe in recipes]
 
-    def add_recipe(self, name, description, ingredients, image, how_to_prepare):
+    def add_recipe(self, name, description, ingredients, image, .prepare):
         new_recipe = Recipes(name=name, description=description, ingredients=ingredients, image=image,
-                             how_to_prepare=how_to_prepare)
+                             prepare=prepare)
         self.session.add(new_recipe)
         self.session.commit()
 

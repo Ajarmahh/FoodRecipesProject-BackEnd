@@ -14,8 +14,8 @@ class Recipes(Base):
     name = Column(String, nullable=False)
     description = Column(String, nullable=False)
     ingredients = Column(String, nullable=False)
-    how_to_prepare = Column(String, nullable=False)
-    image = Column(String, nullable=False)
+    prepare = Column(String, nullable=False)
+    image = Column(String)
 
     def to_dict(self):
         """
@@ -26,6 +26,6 @@ class Recipes(Base):
             "name": self.name,
             "description": self.description,
             "ingredients": self.ingredients,
-            "how_to_prepare": self.how_to_prepare,
+            "prepare": self.prepare,
             "image": self.image,
         }
