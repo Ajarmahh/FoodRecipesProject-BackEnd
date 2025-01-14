@@ -7,7 +7,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Enable CORS to allow requests from http://localhost:5173
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+CORS(app)
 
 data = DataManager("data/recipes.db")
 
@@ -37,10 +37,10 @@ def add_recipe():
         description = request.json['description']
         ingredients = request.json['ingredients']
         image = request.json['image']
-        how_to_prepare = request.json['how_to_prepare']
+        prepare = request.json['prepare']
 
         # Add the new recipe to the database.
-        data.add_recipe(name, description, ingredients, image, how_to_prepare)
+        data.add_recipe(name, description, ingredients, image, prepare)
         return jsonify({"message": "Recipe added successfully"}), 201
     except Exception as e:
         return jsonify({"error": f"Error adding recipe: {e}"}), 500
