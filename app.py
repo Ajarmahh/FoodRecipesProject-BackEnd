@@ -1,15 +1,18 @@
 from flask import Flask, request, jsonify
 from data_manager import DataManager
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+import config
+
 
 app = Flask(__name__)
 # Enable Cross-Origin Resource Sharing, allowing external clients to access the API.
 CORS(app)
-
-# Enable CORS to allow requests from http://localhost:5173
-CORS(app)
+jwt = JWTManager(app)
 
 data = DataManager("data/recipes.db")
+
+app.config.from_object("config.Config")
 
 
 @app.route('/', methods=['GET'])
@@ -25,7 +28,32 @@ def get_recipes():
         return jsonify({"error": f"Error fetching recipes: {e}"}), 500
 
 
+@app.route('/register', methods=['POST'])
+def register():
+    data_reg = request.get_json()
+    email = data_reg['email']
+    password = data_reg['password']
+    username = data_reg['username']
+    # Here we simply store the password directly (no hashing)
+    data.registration(email, password, username)
+    return jsonify({"message": "User registered successfully"}), 201
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    data_log = request.get_json()
+    email = data_log['email']
+    password = data_log['password']
+    user = data.authenticate(email, password)
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+    # Create a JWT access token
+    access_token = create_access_token(identity=email)
+    return jsonify({"access_token": access_token})
+
+
 @app.route('/add_recipe', methods=['POST'])
+@jwt_required()
 def add_recipe():
     """
     Handle adding a new recipe to the database.
@@ -47,6 +75,7 @@ def add_recipe():
 
 
 @app.route('/delete_recipe/<int:recipe_id>', methods=['DELETE'])
+@jwt_required()
 def delete_recipe(recipe_id):
     """
     Handle deletion of a recipe by its ID.
