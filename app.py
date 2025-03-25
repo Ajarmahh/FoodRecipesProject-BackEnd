@@ -1,9 +1,10 @@
+from functools import wraps
+# from data_models import Users
 from flask import Flask, request, jsonify
 from data_manager import DataManager
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt
 import config
-
 
 app = Flask(__name__)
 # Enable Cross-Origin Resource Sharing, allowing external clients to access the API.
@@ -13,6 +14,17 @@ jwt = JWTManager(app)
 data = DataManager("data/recipes.db")
 
 app.config.from_object("config.Config")
+
+
+def admin_required(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        claims = get_jwt()
+        if claims.get('role') != 'admin':
+            return jsonify(msg='You are not allowed to see this, you are not an admin!'), 403
+        return fn(*args, **kwargs)
+
+    return jwt_required()(wrapper)
 
 
 @app.route('/', methods=['GET'])
@@ -39,6 +51,19 @@ def register():
     return jsonify({"message": "User registered successfully"}), 201
 
 
+@app.route('/admin_login', methods=['POST'])
+def admin_login():
+    data_log = request.get_json()
+    email = data_log['email']
+    password = data_log['password']
+    admin = data.authenticate_admin(email, password)
+    if not admin:
+        return jsonify({"message": "Admin not found"}), 404
+    # Create a JWT access token
+    access_token = create_access_token(identity=email, additional_claims={"role": "admin"})
+    return jsonify({"access_token": access_token})
+
+
 @app.route('/login', methods=['POST'])
 def login():
     data_log = request.get_json()
@@ -59,8 +84,10 @@ def add_recipe():
     Handle adding a new recipe to the database.
     """
     try:
+        # Get the user ID from the JWT
+        user_id = get_jwt_identity()
+
         # Extract recipe details from the submitted form.
-        # name = request.form.get('name')
         name = request.json['name']
         description = request.json['description']
         ingredients = request.json['ingredients']
@@ -68,8 +95,11 @@ def add_recipe():
         prepare = request.json['prepare']
 
         # Add the new recipe to the database.
-        data.add_recipe(name, description, ingredients, image, prepare)
-        return jsonify({"message": "Recipe added successfully"}), 201
+        data.add_recipe(name, description, ingredients, image, prepare, user_id)
+        return jsonify({
+            "message": "Recipe submitted successfully. It will be published once an admin approves it.",
+            "status": "pending"
+        }), 201
     except Exception as e:
         return jsonify({"error": f"Error adding recipe: {e}"}), 500
 
@@ -85,6 +115,28 @@ def delete_recipe(recipe_id):
         return f'Recipe num {recipe_id} Deleted'
     except Exception as e:
         return e
+
+
+@app.route('/admin/users', methods=['GET'])
+@admin_required
+def get_users():
+    email = request.args.get('email')
+    result = data.admin_only_users(email)
+    return jsonify(result[0])
+
+
+@app.route('/admin/users/<int:user_id>', methods=['DELETE'])
+@admin_required
+def delete_user(user_id):
+    result = data.delete_user_by_id(user_id)
+    return jsonify({"message": result[0]})
+
+
+@app.route('/admin/users/<int:user_id>/make_admin', methods=['POST'])
+@admin_required
+def make_user_admin(user_id):
+    result = data.make_user_admin(user_id)
+    return jsonify({"message": result[0]})
 
 
 if __name__ == '__main__':

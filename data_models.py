@@ -1,21 +1,20 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum
+import enum
 from sqlalchemy.orm import declarative_base
-from datetime import datetime, timezone
 
 Base = declarative_base()
 
 
-class Admin(Base):
+class Admins(Base):
     """
     Represents an admin in the system. This model stores admin-specific information,
     including name, email, hashed password, and admin status.
     """
     __tablename__ = 'admins'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
+    username = Column(String, nullable=False)
     email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
 
     def to_dict(self):
         """
@@ -23,9 +22,8 @@ class Admin(Base):
         """
         return {
             "id": self.id,
-            "name": self.name,
+            "username": self.username,
             "email": self.email,
-            "created_at": self.created_at
         }
 
 
@@ -46,9 +44,18 @@ class Users(Base):
         """
         return {
             "id": self.id,
-            "name": self.name,
+            "username": self.username,
             "email": self.email
         }
+
+
+class RecipeStatusEnum(enum.Enum):
+    """
+    Enum representing the possible statuses of a recipe.
+    """
+    pending = "pending"
+    approved = "approved"
+    rejected = "rejected"
 
 
 class Recipes(Base):
@@ -64,6 +71,7 @@ class Recipes(Base):
     prepare = Column(String, nullable=False)
     image = Column(String)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)  # Foreign key linking the recipe to a user
+    status = Column(Enum(RecipeStatusEnum), default=RecipeStatusEnum.pending)
 
     def to_dict(self):
         """
@@ -77,6 +85,7 @@ class Recipes(Base):
             "prepare": self.prepare,
             "image": self.image,
             "user_id": self.user_id,
+            "status": self.status.value,
         }
 
 
@@ -85,6 +94,6 @@ class Comments(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)  # Name of the person commenting
     comment_text = Column(String, nullable=False)
-    comment_time = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))  # Default to current time
+    #comment_time = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))  # Default to current time
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)  # Links comment to a user
     recipe_id = Column(Integer, ForeignKey('recipes.id'), nullable=False)  # Links comment to a recipe
